@@ -248,6 +248,18 @@ Seus commits vão direto para o repositório original - aparecem no seu perfil e
 
 ## Passo 9 - Abra o Pull Request
 
+**O que é um PR**
+
+Um Pull Request é um pedido formal para integrar o código de uma branch em outra. É também o principal espaço de code review, discussão técnica e aprendizado em time.
+
+**Quando abrir um PR**
+
+- Quando a funcionalidade ou correção estiver completa e testada localmente
+- Quando você quiser feedback antes de terminar - abra como Draft PR
+- Assim que a branch estiver pronta — não espere o momento perfeito
+
+**Como abrir**
+
 No GitHub, acesse o repositório original da Starlight:
 
 1. Clique em **Compare & pull request**
@@ -258,8 +270,41 @@ No GitHub, acesse o repositório original da Starlight:
 
 > ⚠️ O PR vai para `develop`, não para `main`. PRs direto para `main` serão rejeitados.
 
----
+**Como escrever um bom PR**
 
+Um PR bem escrito facilita a vida de quem vai revisar. Use este modelo:
+
+## O que essa PR faz
+Descrição clara e objetiva da mudança.
+
+## Por que fiz
+Contexto: qual problema isso resolve?
+
+## Principais alterações
+- Arquivo X: o que mudou e por quê
+- Arquivo Y: o que mudou e por quê
+
+## Como testar
+Passo a passo para a revisora verificar o funcionamento.
+
+```bash
+# Exemplo
+pytest tests/test_validacao.py -v
+```
+
+Closes #2
+
+
+**Título do PR**
+
+Segue o mesmo padrão dos commits:
+
+- feat(validacao): implementar detecção de inconsistências no dataset
+- fix(logging): corrigir formato JSON no log de erros
+- docs(runbook): adicionar seção de reprocessamento no Airflow
+
+
+---
 ## O que esperar do review
 
 | Prefixo | O que significa |
