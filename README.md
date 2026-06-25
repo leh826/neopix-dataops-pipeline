@@ -50,9 +50,9 @@ O dataset não está incluído no repositório, ele contém dados sintéticos de
 
 **Como baixar**
 
-Acesse: Dataset NeoPix - Google Drive
-Faça o download de `transacoes.csv` 
-Salve em `data/raw/transacoes.csv`
+Acesse: Dataset NeoPix - [Google Drive](https://drive.google.com/drive/folders/13u1WjeODVBNVj07C2YwrftflgZxIA29L)
+- Faça o download de `transacoes.csv` 
+- Salve em `data/raw/transacoes.csv`
 
 A pasta também contém `transacoes_sample.csv`,usado nas fixtures de teste (Issue 07). Esse arquivo vai em `tests/fixtures/transacoes_sample.csv.`
 
@@ -173,8 +173,8 @@ neopix-pipeline-monitor/
 ### 2. Clone o seu fork
 
 ```bash
-git clone https://github.com/SEU-USUARIO/neopix-pipeline-monitor.git
-cd neopix-pipeline-monitor
+git clone https://github.com/SEU-USUARIO/neopix-dataops-pipeline.git
+cd neopix-dataops-pipeline
 ```
 
 ### 3. Configure o remote original
@@ -232,12 +232,12 @@ pytest tests/
 | Critério | O que será observado |
 |----------|---------------------|
 | **PySpark aplicado corretamente** | Uso de DataFrame API, schema explícito, não é só pandas com nome trocado |
-| **Logging estruturado** | Logs em JSON com nível, contexto, timestamp — não `print()` |
+| **Logging estruturado** | Logs em JSON com nível, contexto, timestamp - não `print()` |
 | **DAG funcional no Airflow** | `docker-compose up` sobe o Airflow e o DAG executa |
 | **Dashboard funcional** | Roda localmente e reflete dados reais do pipeline |
 | **Tratamento de falhas propositais** | Cada falha do dataset é detectada e tratada, não ignorada |
 | **Runbook** | Documento claro, qualquer pessoa do time consegue seguir |
-| **Git e colaboração** | Commits, branches, PRs e code review — mesma régua da Trilha 02 |
+| **Git e colaboração** | Commits, branches, PRs e code review - mesma régua da Trilha 02 |
 
 ---
 
@@ -246,7 +246,7 @@ pytest tests/
 - Docker e Docker Compose instalados
 - Python 3.11
 - PySpark (`pip install pyspark`)
-- Apache Airflow (via Docker — não precisa instalar localmente)
+- Apache Airflow (via Docker)
 
 ---
 
@@ -261,7 +261,9 @@ Cada issue tem uma branch e um critério de aceite específico. Consulte o **[CO
 Esse desafio assume domínio das três trilhas:
 
 → **[Trilha 01 — Fundamentos](https://github.com/Starlight-git-project/trilha-01-fundamentos)**
+
 → **[Trilha 02 — Governança](https://github.com/Starlight-git-project/trilha-02-governanca)**
+
 → **[Trilha 03 — Infraestrutura](https://github.com/Starlight-git-project/trilha-03-infraestrutura)**
 
 Além disso, recomenda-se ter concluído o **[VoughtGuard](https://github.com/Starlight-git-project/voughtguard-pipeline-fraud-detection)** - o NeoPix assume que você já sabe estruturar um repositório de dados e trabalhar com PRs.
