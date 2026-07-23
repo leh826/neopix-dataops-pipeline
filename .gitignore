@@ -1,10 +1,25 @@
 #arquivos python
 .env
-data/raw/
-logs/
-_pycache_/
+logs/*
 .venv/
 *. csv
+
+# Ignora tudo dentro da pasta
+data/raw/*
+data/processed/*
+
+# EXCETO o .gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!logs/.gitkeep
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# Streamlit
+.streamlit/secrets.toml
 
 #arquivos airflow
 airflow.db
