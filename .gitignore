@@ -1,0 +1,12 @@
+#arquivos python
+.env
+data/raw/
+logs/
+_pycache_/
+.venv/
+*. csv
+
+#arquivos airflow
+airflow.db
+airflow.cfg
+/logs/
