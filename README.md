@@ -1,5 +1,20 @@
-# NeoPix — Monitoramento e Operação de Pipelines de Pagamento
+<table>
+<tr>
+<td width="140">
 
+<img width="120" height="150" alt="NeoPix" src="https://github.com/user-attachments/assets/5102e303-7844-4099-83f9-89fd7d873adb" />
+
+</td>
+<td>
+
+# NeoPix - Monitoramento e Operação de Pipelines de Pagamento
+
+> Projeto inspirado em desafio técnico para vaga de **Engenheiro(a) de Dados Júnior - DataOps**  
+> Trilha **[Starlight Git Project](https://github.com/Starlight-git-project)**
+
+</td>
+</tr>
+</table>
 
 ## 📌 Contexto
 
