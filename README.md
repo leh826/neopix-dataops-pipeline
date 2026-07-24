@@ -151,7 +151,7 @@ neopix-pipeline-monitor/
 
 ---
 
-## ✅ Coisas feitas do projeto
+## ✅ Tarefas do Projeto
 
 Progresso das entregas em relação ao escopo do desafio.
 
