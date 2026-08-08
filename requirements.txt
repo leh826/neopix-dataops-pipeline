@@ -1,0 +1,7 @@
+pyspark
+python-dotenv
+pytest
+pytest-cov
+streamlit
+plotly
+apache-airflow
