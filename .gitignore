@@ -1,0 +1,18 @@
+# Variáveis de ambiente
+.env
+
+# Dados
+data/raw/
+data/processed/
+*.csv
+
+# Logs
+logs/
+
+# Airflow
+airflow.db
+airflow.cfg
+
+# Python
+__pycache__/
+.venv/

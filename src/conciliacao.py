@@ -1,0 +1,1 @@
+# Script de conciliação de dados financeiros
