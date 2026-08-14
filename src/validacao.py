@@ -1,1 +1,1 @@
-# Script de conciliação de dados financeiros
+# Detecção das falhas propositais no dataset

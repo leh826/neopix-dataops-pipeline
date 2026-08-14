@@ -2,17 +2,25 @@
 .env
 
 # Dados
-data/raw/
-data/processed/
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
 *.csv
+!tests/fixtures/transacoes_sample.csv
 
 # Logs
-logs/
+logs/*
+!logs/.gitkeep
+*.log
 
 # Airflow
 airflow.db
 airflow.cfg
+airflow-webserver.pid
 
 # Python
 __pycache__/
 .venv/
+venv/
+*.pyc

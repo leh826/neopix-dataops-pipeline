@@ -1,1 +1,1 @@
-# Script de conciliação de dados financeiros
+# Leitura e ingestão de dados com PySpark (schema validation)

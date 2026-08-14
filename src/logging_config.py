@@ -1,1 +1,1 @@
-# Script de conciliação de dados financeiros
+# Logging estruturado (JSON) — logger central do projeto

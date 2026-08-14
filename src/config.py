@@ -1,1 +1,1 @@
-# Script de conciliação de dados financeiros
+# Configurações e variáveis do projeto (paths, env, constantes)
