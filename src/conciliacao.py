@@ -1,1 +1,1 @@
-# Script de conciliação de dados financeiros
+# Lógica de conciliação de transações

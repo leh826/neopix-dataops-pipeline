@@ -1,4 +1,30 @@
+# docker-compose.yml — ESQUELETO
+#
+# Este arquivo é apenas a estrutura base (Issue 05 - Estrutura do repositório).
+# A configuração completa e funcional do Airflow (volumes, healthchecks,
+# variáveis de ambiente reais, etc.) será feita na Issue 10.
 
-# docker-compose.yml
+version: "3.8"
 
-#Esqueleto inicial de ambiente.
+services:
+
+  # TODO (Issue 10): banco de metadados do Airflow (Postgres)
+  postgres:
+    image: postgres:15
+    # env_file: .env
+    # volumes:
+    # healthcheck:
+
+  # TODO (Issue 10): webserver do Airflow (UI em localhost:8080)
+  airflow-webserver:
+    # depends_on: [postgres]
+    # ports: ["8080:8080"]
+    # volumes: [./dags:/opt/airflow/dags, ./logs:/opt/airflow/logs]
+
+  # TODO (Issue 10): scheduler do Airflow (dispara as DAGs)
+  airflow-scheduler:
+    # depends_on: [postgres, airflow-webserver]
+    # volumes: [./dags:/opt/airflow/dags, ./src:/opt/airflow/src]
+
+# TODO (Issue 10): volumes nomeados (ex: postgres-db-volume)
+volumes: {}
