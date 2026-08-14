@@ -84,3 +84,8 @@ logger.error(
 | `WARNING` | Algo estranho, mas não impede o pipeline de continuar |
 | `ERROR` | Algo quebrou e precisa de atenção |
 | `EXCEPTION` | Erro capturado em `try/except`, inclui stack trace completo |
+
+### O que é o logs/pipeline.log
+É o arquivo de log gerado quando o pipeline roda.
+Esse sim continua fora do Git, no .gitignore, porque é dado de runtime, não documentação.
+
