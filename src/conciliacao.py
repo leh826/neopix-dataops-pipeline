@@ -85,3 +85,28 @@ def tempo_medio_processamento(df: pd.DataFrame) -> pd.DataFrame:
         .round(2)
         .reset_index()
     )
+
+def salvar_conciliacao(df: pd.DataFrame, caminho: str) -> None:
+    """
+    Salva o resultado da conciliação em disco, em formato CSV.
+ 
+    Args:
+        df: DataFrame com o resultado a ser salvo.
+        caminho: caminho completo do arquivo de destino
+            (ex: data/processed/conciliacao_bancos.csv).
+ 
+    Raises:
+        Exception: se ocorrer qualquer erro durante a escrita em disco.
+    """
+    try:
+        df.to_csv(caminho, index=False)
+        logger.info("Conciliação salva com sucesso", extra={"caminho": caminho})
+    except Exception as e:
+        logger.error(
+            "Falha ao salvar conciliação",
+            extra={"caminho": caminho, "erro": str(e)},
+        )
+        raise
+
+
+    
