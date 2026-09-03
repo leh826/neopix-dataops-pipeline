@@ -109,4 +109,48 @@ def salvar_conciliacao(df: pd.DataFrame, caminho: str) -> None:
         raise
 
 
-    
+def executar_conciliacao(
+    df: pd.DataFrame,
+    caminho_saida: str = CAMINHO_CONCILIACAO,
+) -> pd.DataFrame:
+    """
+    Orquestra o processo completo de conciliação: agrupamento por banco,
+    cálculo de taxa de sucesso e tempo médio de processamento, e
+    persistência do resultado consolidado em disco.
+ 
+    Args:
+        df: DataFrame de transações já validado (saída da Issue #8).
+        caminho_saida: caminho do arquivo CSV de destino
+            (default: config.CAMINHO_CONCILIACAO).
+ 
+    Returns:
+        DataFrame final consolidado da conciliação por banco.
+    """
+    qtd_registros = len(df)
+    logger.info("Início da conciliação", extra={"qtd_registros": qtd_registros})
+ 
+    df_por_banco = conciliar_por_banco(df)
+    df_taxa_sucesso = calcular_taxa_sucesso(df)
+    df_tempo_medio = tempo_medio_processamento(df)
+ 
+    df_final = df_por_banco.merge(
+        df_taxa_sucesso, on="origin_bank", how="left"
+    ).merge(
+        df_tempo_medio, on="origin_bank", how="left"
+    )
+ 
+    salvar_conciliacao(df_final, caminho_saida)
+ 
+    logger.info(
+        "Fim da conciliação",
+        extra={"qtd_registros": qtd_registros, "qtd_grupos": len(df_final)},
+    )
+ 
+    return df_final
+ 
+ 
+if __name__ == "__main__":
+    df_transacoes = ler_transacoes(CAMINHO_TRANSACOES)
+    df_validado = executar_validacoes(df_transacoes)
+    executar_conciliacao(df_validado)
+ 
