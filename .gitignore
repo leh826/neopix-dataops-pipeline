@@ -1,27 +1,26 @@
-#arquivos python
+# Variáveis de ambiente
 .env
-logs/*
-.venv/
-*. csv
 
-# Ignora tudo dentro da pasta
+# Dados
 data/raw/*
-data/processed/*
-
-# EXCETO o .gitkeep
 !data/raw/.gitkeep
+data/processed/*
 !data/processed/.gitkeep
+*.csv
+!tests/fixtures/transacoes_sample.csv
+
+# Logs
+logs/*
 !logs/.gitkeep
+*.log
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
-
-# Streamlit
-.streamlit/secrets.toml
-
-#arquivos airflow
+# Airflow
 airflow.db
 airflow.cfg
-/logs/
+airflow-webserver.pid
+
+# Python
+__pycache__/
+.venv/
+venv/
+*.pyc

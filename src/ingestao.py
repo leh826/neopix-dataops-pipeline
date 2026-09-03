@@ -1,104 +1,108 @@
-import logging
+"""
+ingestao.py
+
+Camada de leitura dos dados brutos do pipeline NeoPix.
+Porta de entrada dos dados: aplica schema explícito e nunca falha em
+silêncio (todo erro é logado com contexto via logging_config.py).
+"""
+
 import os
 
-from pyspark.sql import DataFrame
-from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
-    DoubleType,
-    IntegerType,
-    TimestampType,
-)
+import pandas as pd
 
-from src.config import get_spark_session, CAMINHO_TRANSACOES
+from src.config import CAMINHO_TRANSACOES, COLUNAS_ESPERADAS, DTYPES_ESPERADOS
+from src.logging_config import get_logger
 
-logger = logging.getLogger(__name__)
-
-schema_transacoes = StructType([
-    StructField("transaction_id", StringType(), nullable=False),
-    StructField("timestamp", TimestampType(), nullable=True),
-    StructField("amount", DoubleType(), nullable=True),
-    StructField("status", StringType(), nullable=True),
-    StructField("origin_bank", StringType(), nullable=True),
-    StructField("destination_bank", StringType(), nullable=True),
-    StructField("processing_time_ms", IntegerType(), nullable=True),
-])
+logger = get_logger("ingestao")
 
 
-def validar_schema(df: DataFrame, caminho: str, schema_esperado: StructType) -> None:
+def _validar_colunas(df: pd.DataFrame, caminho: str) -> None:
     """
-    Valida se o schema real do DataFrame bate com o schema esperado.
+    Valida se o DataFrame lido tem exatamente as colunas esperadas
+    (nem faltando, nem a mais). Roda antes de qualquer conversão de
+    tipo, pra evitar KeyError ao acessar uma coluna que não existe.
 
     Args:
-        df: DataFrame a ser validado.
+        df: DataFrame recém-lido do CSV, ainda sem conversão de tipos.
         caminho: caminho de origem do arquivo (usado só para contexto no log).
-        schema_esperado: schema que o DataFrame deveria ter.
 
     Raises:
-        ValueError: se o schema real não corresponder ao esperado.
+        ValueError: se colunas estiverem faltando ou sobrando.
     """
-    schema_real = df.schema
-    if schema_real != schema_esperado:
-        colunas_esperadas = set(f.name for f in schema_esperado.fields)
-        colunas_reais = set(f.name for f in schema_real.fields)
+    colunas_reais = set(df.columns)
+    colunas_esperadas = set(COLUNAS_ESPERADAS)
 
-        faltando = colunas_esperadas - colunas_reais
-        extras = colunas_reais - colunas_esperadas
+    faltando = colunas_esperadas - colunas_reais
+    extras = colunas_reais - colunas_esperadas
 
+    if faltando or extras:
         logger.error(
-            "Schema incompatível",
+            "Schema incompatível: colunas divergentes",
             extra={
                 "caminho": caminho,
                 "colunas_faltando": list(faltando),
                 "colunas_extras": list(extras),
             },
         )
-        raise ValueError(f"Schema incompatível no arquivo {caminho}")
-
-    logger.info("Schema validado com sucesso", extra={"caminho": caminho})
+        raise ValueError(f"Schema incompatível no arquivo {caminho}: colunas divergentes")
 
 
-def ler_transacoes(
-    caminho: str = CAMINHO_TRANSACOES,
-    schema: StructType = schema_transacoes,
-) -> DataFrame:
+def ler_transacoes(caminho: str = CAMINHO_TRANSACOES) -> pd.DataFrame:
     """
-    Lê o arquivo CSV de transações usando schema explícito e valida
-    se o schema real do arquivo corresponde ao esperado.
+    Lê o arquivo CSV de transações, aplica os dtypes esperados e valida
+    o schema resultante.
 
     Args:
         caminho: caminho do arquivo CSV (default: config.CAMINHO_TRANSACOES).
-        schema: schema explícito esperado (default: schema_transacoes).
 
     Returns:
-        DataFrame com os dados carregados.
+        DataFrame pandas com os dados carregados e o schema validado.
 
     Raises:
         FileNotFoundError: se o arquivo não existir no caminho informado.
         ValueError: se o schema do arquivo não corresponder ao esperado.
-        Exception: se ocorrer qualquer outro erro durante a leitura pelo Spark.
+        Exception: se ocorrer qualquer outro erro durante a leitura.
+
+    Exemplo:
+        >>> df = ler_transacoes("data/raw/transacoes.csv")
+        >>> df.shape
+        (10050, 7)
     """
     if not os.path.exists(caminho):
         logger.error("Arquivo não encontrado", extra={"caminho": caminho})
         raise FileNotFoundError(f"Arquivo não encontrado: {caminho}")
 
-    spark = get_spark_session()
-
     try:
-        df = spark.read.csv(caminho, header=True, schema=schema)
-        linhas = df.count()
-        logger.info(
-            "Arquivo lido com sucesso",
-            extra={"caminho": caminho, "linhas": linhas},
-        )
+        # Lê sem dtype ainda: se colunas estiverem faltando, queremos que
+        # isso vire um ValueError limpo em _validar_colunas(), não um
+        # KeyError feio ao tentar acessar uma coluna inexistente.
+        df = pd.read_csv(caminho)
+        linhas = len(df)
+        logger.info("Arquivo lido com sucesso", extra={"caminho": caminho, "linhas": linhas})
     except Exception as e:
-        logger.error(
-            "Falha ao ler CSV",
-            extra={"caminho": caminho, "erro": str(e)},
-        )
+        logger.error("Falha ao ler CSV", extra={"caminho": caminho, "erro": str(e)})
         raise
 
-    validar_schema(df, caminho, schema)
+    _validar_colunas(df, caminho)
+
+    # Só converte tipos depois de confirmar que as colunas existem.
+    # timestamp usa errors="coerce": valores fora do formato viram NaT
+    # (não quebram a leitura, mas ficam rastreáveis pela validação, issue #8).
+    for coluna, dtype_esperado in DTYPES_ESPERADOS.items():
+        try:
+            df[coluna] = df[coluna].astype(dtype_esperado)
+        except (ValueError, TypeError) as e:
+            logger.error(
+                "Falha ao converter tipo de coluna",
+                extra={"caminho": caminho, "coluna": coluna, "erro": str(e)},
+            )
+            raise ValueError(
+                f"Schema incompatível no arquivo {caminho}: "
+                f"coluna '{coluna}' não pôde ser convertida para {dtype_esperado}"
+            )
+
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+
+    logger.info("Schema validado com sucesso", extra={"caminho": caminho})
 
     return df

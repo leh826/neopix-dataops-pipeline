@@ -1,1 +1,1 @@
-# lógica de conciliação
+# Lógica de conciliação de transações

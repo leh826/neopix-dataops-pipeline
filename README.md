@@ -27,163 +27,143 @@ Este projeto simula a rotina do time de **DataOps**, responsável por manter os 
 - Dar visibilidade via dashboards
 - Orquestrar a execução de forma confiável
 
-A missão é assumir, estabilizar, monitorar e dar visibilidade ao pipeline de **conciliação de transações** que existe.
-
-### Sobre o dataset
-
-- 10.050 transações Pix simuladas, com inconsistências reais de pipeline.
-- **Não versionado no Git** — baixado separadamente e salvo em `data/raw/transacoes.csv`.
-- Um arquivo `transacoes_sample.csv` é usado nas fixtures de teste (`tests/fixtures/`).
-
-| Coluna | Descrição |
-|---|---|
-| `transaction_id` | Identificador único da transação |
-| `timestamp` | Data e hora da transação |
-| `amount` | Valor da transação |
-| `status` | `completed`, `failed`, `pending` ou `reversed` |
-| `origin_bank` | Banco de origem |
-| `destination_bank` | Banco de destino |
-| `processing_time_ms` | Tempo de processamento em milissegundos |
+Você foi contratada para o time de DataOps. O pipeline de **conciliação de transações** já existe, mas tem problemas. Sua missão é assumir, estabilizar, monitorar e dar visibilidade a ele.
 
 ---
 
-## ⚙️ Instalação
+Este repositório contém o pipeline de conciliação de transações da NeoPix, que
+já existe mas tem problemas. A missão do time é assumir, estabilizar,
+monitorar e dar visibilidade a ele.
 
-### Pré-requisitos
+## Stack
 
-- Python 3.11
-- Docker e Docker Compose
-- Java (JDK) instalado — necessário para o PySpark funcionar
+- **PySpark** - leitura, validação e conciliação dos dados
+- **Orquestração** - em definição (ver nota abaixo)
+- **Streamlit** - dashboard de monitoramento
+- **pytest** - testes automatizados
+- **Logging estruturado (JSON)** - observabilidade
 
-### 1. Fork e clone do repositório
+> ⚠️ **Decisão em aberto:** a orquestração ainda não está definida entre
+> Airflow (via Docker Compose) ou um script próprio. O `docker-compose.yml`
+> permanece no repo como esqueleto e a flag `USE_AIRFLOW` no `.env.example`
+> documenta esse estado. Decisão final até a Sprint 4 (issues #14/#15).
 
-```bash
-git clone https://github.com/SEU-USUARIO/neopix-dataops-pipeline.git
-cd neopix-dataops-pipeline
-```
-
-### 2. Configurar o remote original (upstream)
-
-```bash
-git remote add upstream https://github.com/Starlight-git-project/neopix-dataops-pipeline.git
-```
-
-### 3. Criar e ativar o ambiente virtual
-
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Linux/Mac
-.venv\Scripts\activate           # Windows
-```
-
-### 4. Instalar dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Configurar variáveis de ambiente
-
-```bash
-cp .env.example .env
-```
-
-### 6. Baixar o dataset
-
-- Baixar `transacoes.csv` do [Google Drive](https://drive.google.com/drive/folders/13u1WjeODVBNVj07C2YwrftflgZxIA29L)
-- Salvar em `data/raw/transacoes.csv`
-- Baixar `transacoes_sample.csv` e salvar em `tests/fixtures/transacoes_sample.csv`
-
-> 🚨 `data/raw/` está no `.gitignore` — o dataset nunca deve ser commitado.
-
-### 7. Subir o Airflow local
-
-```bash
-docker-compose up
-```
-
-Acessar a UI em `http://localhost:8080`
-
-### 8. Executar o dashboard
-
-```bash
-streamlit run dashboard/app.py
-```
-
-### 9. Rodar os testes
-
-```bash
-pytest tests/
-```
-
----
-
-## 🗂️ Estrutura de pastas
+## Estrutura do repositório
 
 ```
+
 neopix-pipeline-monitor/
 │
 ├── .env.example
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
-├── docker-compose.yml          # Airflow local
+├── docker-compose.yml # Airflow local (esqueleto — decisão pendente)
 │
 ├── data/
-│   ├── raw/                    # dados originais com falhas
-│   │   ├── transacoes.csv
-│   │   └── .gitkeep
-│   └── processed/              # dados conciliados e relatórios
-│       └── .gitkeep
+│ ├── raw/ # dados originais com falhas (não versionado)
+│ │ └── .gitkeep
+│ └── processed/ # dados conciliados + relatórios
+│ └── .gitkeep
 │
 ├── src/
-│   ├── __init__.py
-│   ├── config.py
-│   ├── ingestao.py             # leitura PySpark com schema validation
-│   ├── validacao.py            # detecção das falhas
-│   ├── conciliacao.py          # lógica de conciliação
-│   └── logging_config.py       # logging estruturado (JSON)
+│ ├── init.py
+│ ├── config.py
+│ ├── ingestao.py # leitura PySpark com schema validation
+│ ├── validacao.py # detecção das falhas
+│ ├── conciliacao.py # lógica de conciliação
+│ └── logging_config.py # logging estruturado (JSON)
 │
 ├── dags/
-│   └── pipeline_neopix_dag.py  # DAG do Airflow
+│ └── .gitkeep # pipeline_neopix_dag.py vem na Issue 15 (se Airflow)
 │
 ├── dashboard/
-│   └── app.py                  # Streamlit - saúde do pipeline
+│ └── .gitkeep # app.py vem na Issue 13
 │
 ├── tests/
-│   ├── fixtures/
-│   │   └── transacoes_sample.csv
-│   ├── test_validacao.py
-│   └── test_conciliacao.py
+│ ├── init.py
+│ ├── fixtures/
+│ │ └── .gitkeep # transacoes_sample.csv vem na Issue 07
+│ ├── test_validacao.py
+│ └── test_conciliacao.py
 │
 ├── logs/
-│   └── .gitkeep                # logs gerados em runtime
+│ └── .gitkeep # logs gerados em runtime (não versionado)
 │
 └── docs/
-    ├── orientacoes.md
-    └── runbook.md              # guia de operação e troubleshooting
+└── .gitkeep # runbook.md vem na Issue 16
+
+
+
 ```
+
+## Como começar
+
+### 1. Fork e clone
+
+```bash
+git clone https://github.com/SEU-USUARIO/neopix-dataops-pipeline.git
+cd neopix-dataops-pipeline
+git remote add upstream https://github.com/Starlight-git-project/neopix-dataops-pipeline.git
+```
+
+### 2. Ambiente Python
+
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Linux/Mac
+.venv\Scripts\activate           # Windows
+
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+### 3. Dataset
+
+O dataset **não está no repositório** (dados sintéticos de produção, não
+versionados). Baixe `transacoes.csv` e salve em `data/raw/transacoes.csv`.
+`transacoes_sample.csv` vai em `tests/fixtures/`.
+
+> 🚨 `data/raw/` está no `.gitignore` — nunca commite esse arquivo.
+
+### 4. Orquestração (Airflow — enquanto decisão não é fechada)
+
+```bash
+docker-compose up
+```
+
+> O `docker-compose.yml` ainda é só esqueleto — não está funcional. A decisão
+> entre Airflow e script próprio de orquestração está em aberto (ver Stack).
+
+### 5. Dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+### 6. Testes
+
+```bash
+pytest tests/
+```
+
+## Entregáveis
+
+| # | Entregável | O que avalia |
+|---|---|---|
+| 01 | Repositório público com README claro | Documentação |
+| 02 | Pipeline em PySpark — leitura, validação, conciliação | Stack técnica da vaga |
+| 03 | Sistema de logging estruturado | Observabilidade |
+| 04 | Orquestração (Airflow ou script próprio — decisão pendente) | Orquestração real |
+| 05 | Dashboard de visualização (Streamlit) | DataViz |
+| 06 | Testes automatizados com pytest | Qualidade |
+| 07 | `docs/runbook.md` | Operação/DataOps |
+
+## Contribuindo
+
+Cada issue tem uma branch e um critério de aceite específico. Consulte o
+`CONTRIBUTING.md` para o fluxo completo de branch e PR.
 
 ---
 
-## ✅ Tarefas do Projeto
-
-Progresso das entregas em relação ao escopo do desafio.
-
-- [x] **Repositório público com README claro** — documentação inicial do projeto
-- [ ] **Pipeline em PySpark** — leitura, validação e conciliação usando DataFrame API
-- [ ] **Sistema de logging estruturado** — todo erro registrado em JSON, com contexto
-- [ ] **DAG do Airflow** — orquestração real, rodando via Docker Compose
-- [ ] **Dashboard de visualização (Streamlit)** — métricas de saúde do pipeline
-- [ ] **Testes automatizados (pytest)** — cobertura das regras de validação e conciliação
-- [ ] **`docs/runbook.md`** — guia do que fazer quando o pipeline falha
-
-## 📊 Métricas do dashboard
-
-- Total de transações processadas
-- Taxa de sucesso vs falha (`completed` / `failed` / `pending` / `reversed`)
-- Tempo médio de processamento (`processing_time_ms`)
-- Quantidade de registros rejeitados pela validação (com motivo)
-- Gráfico de transações por banco de origem/destino
-- Status da última execução do pipeline (sucesso/falha + timestamp)
-
+⭐ Starlight Git Project · open source · feito para profissionais de dados
