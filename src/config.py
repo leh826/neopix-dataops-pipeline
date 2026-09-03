@@ -6,7 +6,7 @@ Configurações e schema esperado do projeto NeoPix.
 
 # Caminho do dataset (nunca hardcoded nos módulos que o usam)
 CAMINHO_TRANSACOES = "data/raw/transacoes.csv"
-
+CAMINHO_CONCILIACAO = "data/processed/conciliacao_bancos.csv"
 # Schema esperado do dataset de transações.
 # Em Pandas não existe StructType (isso é Spark) — o equivalente é
 # declarar os dtypes esperados por coluna, usados na validação pós-leitura.
